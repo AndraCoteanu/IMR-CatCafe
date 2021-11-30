@@ -1,4 +1,6 @@
 using Photon.Pun;
+using Photon.Voice.Unity;
+using Photon.Voice.PUN;
 using UnityEngine;
 
 public class GameManager : MonoBehaviourPunCallbacks
@@ -11,6 +13,15 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     // The rig is higher and in front of the player object
     private readonly Vector3 rigOffset = new Vector3(0f, 7.25f, 1.5f);
+
+    public byte Group
+    {
+        set
+        {
+            PhotonVoiceNetwork.Instance.Client.GlobalInterestGroup = value;
+            PhotonVoiceNetwork.Instance.PrimaryRecorder.InterestGroup = value;
+        }
+    }
 
     void Start()
     {
