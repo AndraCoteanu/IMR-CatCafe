@@ -1,5 +1,4 @@
 using Photon.Pun;
-using Photon.Voice.Unity;
 using Photon.Voice.PUN;
 using UnityEngine;
 
@@ -10,11 +9,13 @@ public class GameManager : MonoBehaviourPunCallbacks
     [HideInInspector]
     public GameObject playerObject;
     public GameObject xrRig;
+    
+    private Seat[] seats;
 
     // The rig is higher and in front of the player object
     private readonly Vector3 rigOffset = new Vector3(0f, 7.25f, 1.5f);
 
-    public byte Group
+    private byte Group
     {
         set
         {
@@ -26,16 +27,20 @@ public class GameManager : MonoBehaviourPunCallbacks
     void Start()
     {
         instance = this;
+        seats = GameObject.FindObjectsOfType<Seat>();
     }
 
     public override void OnJoinedRoom()
     {
-        var position = new Vector3(0f, 0f, 5f * PhotonNetwork.CountOfPlayers);
-        var rotation = Quaternion.identity;
-        playerObject = PhotonNetwork.Instantiate(playerPrefab.name, position, rotation, 0);
+        var seat = seats[PhotonNetwork.PlayerList.Length - 1];
+        Group = seat.group;
 
-        position += rigOffset;
-        xrRig.transform.position = position;
-        xrRig.transform.rotation = rotation;
+        playerObject = PhotonNetwork.Instantiate(playerPrefab.name, seat.transform.position, seat.transform.rotation, 0);
+
+        var position = seat.transform.position + rigOffset;
+        xrRig.transform.position = seat.transform.position;
+        xrRig.transform.Translate(rigOffset, seat.transform);
+        xrRig.transform.rotation = seat.transform.rotation;
+
     }
 }
