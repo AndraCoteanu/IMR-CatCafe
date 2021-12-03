@@ -1,6 +1,7 @@
 using Photon.Pun;
 using Photon.Voice.PUN;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
@@ -9,11 +10,10 @@ public class GameManager : MonoBehaviourPunCallbacks
     [HideInInspector]
     public GameObject playerObject;
     public GameObject xrRig;
-    
-    private Seat[] seats;
 
-    // The rig is higher and in front of the player object
-    private readonly Vector3 rigOffset = new Vector3(0f, 7.25f, 1.5f);
+    private SeatBehaviour[] seats;
+    private SeatBehaviour currentSeat = null;
+    private const float seatHeight = 3.5f;
 
     private byte Group
     {
@@ -27,20 +27,58 @@ public class GameManager : MonoBehaviourPunCallbacks
     void Start()
     {
         instance = this;
-        seats = GameObject.FindObjectsOfType<Seat>();
+        seats = GameObject.FindObjectsOfType<SeatBehaviour>();
+    }
+
+    void Update()
+    {
+        if (currentSeat != null || PhotonNetwork.CurrentRoom == null)
+        {
+            return;
+        }
+        foreach (var seat in seats)
+        {
+            if (seat.synced && !seat.taken)
+            {
+                TakeSeat(seat);
+            }
+        }
     }
 
     public override void OnJoinedRoom()
     {
-        var seat = seats[PhotonNetwork.PlayerList.Length - 1];
+        if (PhotonNetwork.PlayerList.Length == 1)
+        {
+            TakeSeat(seats[0]);
+            foreach (var seat in seats)
+            {
+                seat.synced = true;
+            }
+        }
+    }
+
+    public void TakeSeat(SeatBehaviour seat)
+    {
+        seat.taken = true;
+        if (currentSeat != null) {
+            currentSeat.taken = false;
+        }
+        currentSeat = seat;
         Group = seat.group;
 
-        playerObject = PhotonNetwork.Instantiate(playerPrefab.name, seat.transform.position, seat.transform.rotation, 0);
+        var playerPosition = seat.transform.position + (new Vector3(0, seatHeight));
+        var playerRotation = seat.transform.rotation;
+        if (playerObject == null)
+        {
+            playerObject = PhotonNetwork.Instantiate(playerPrefab.name, playerPosition, playerRotation, 0);
+        }
+        else
+        {
+            playerObject.transform.position = playerPosition;
+            playerObject.transform.rotation = playerRotation;
+        }
 
-        var position = seat.transform.position + rigOffset;
-        xrRig.transform.position = seat.transform.position;
-        xrRig.transform.Translate(rigOffset, seat.transform);
-        xrRig.transform.rotation = seat.transform.rotation;
-
+        xrRig.transform.position = playerObject.transform.position;
+        xrRig.transform.rotation = playerObject.transform.rotation;
     }
 }

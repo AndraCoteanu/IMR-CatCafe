@@ -2,19 +2,26 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using Photon.Pun;
 
-public class Seat : MonoBehaviour, IPunObservable
+public class SeatBehaviour : XRBaseInteractable, IPunObservable
 {
     [Min(1)]
     public byte group = 1;
-    public TeleportationAnchor anchor;
+    private TeleportationAnchor anchor;
+    [HideInInspector]
     public bool synced = false;
-    public bool taken = false;
+    public bool taken;
 
     void Start()
     {
-        if (anchor != null)
+        anchor = GetComponent<TeleportationAnchor>();
+        selectExited.AddListener(OnSelected);
+    }
+
+    private void OnSelected(SelectExitEventArgs _)
+    {
+        if (!taken)
         {
-            anchor.enabled = false;
+            GameManager.instance.TakeSeat(this);
         }
     }
 
