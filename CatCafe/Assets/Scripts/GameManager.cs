@@ -1,19 +1,17 @@
 using Photon.Pun;
 using Photon.Voice.PUN;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 
 public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager instance;
-    public GameObject playerPrefab;
+    public CharacterOffset[] characters;
     [HideInInspector]
-    public GameObject playerObject;
+    public GameObject currentCharacter;
     public GameObject xrRig;
 
     private SeatBehaviour[] seats;
     private SeatBehaviour currentSeat = null;
-    private const float seatHeight = 3.5f;
 
     private byte Group
     {
@@ -60,25 +58,34 @@ public class GameManager : MonoBehaviourPunCallbacks
     public void TakeSeat(SeatBehaviour seat)
     {
         seat.taken = true;
-        if (currentSeat != null) {
+        if (currentSeat != null)
+        {
             currentSeat.taken = false;
         }
         currentSeat = seat;
         Group = seat.group;
 
-        var playerPosition = seat.transform.position + (new Vector3(0, seatHeight));
+        var playerPosition = seat.transform.position;
         var playerRotation = seat.transform.rotation;
-        if (playerObject == null)
+        if (currentCharacter == null)
         {
-            playerObject = PhotonNetwork.Instantiate(playerPrefab.name, playerPosition, playerRotation, 0);
+            var player = characters[PlayerPrefs.GetInt("CharacterSelected")];
+            currentCharacter = PhotonNetwork.Instantiate(
+                player.name,
+                playerPosition + new Vector3(0f, player.modelOffset, 0f),
+                playerRotation,
+                0
+            );
         }
         else
         {
-            playerObject.transform.position = playerPosition;
-            playerObject.transform.rotation = playerRotation;
+            var offset = currentCharacter.GetComponent<CharacterOffset>();
+            currentCharacter.transform.position = playerPosition + new Vector3(0f, offset.modelOffset, 0f);
+            currentCharacter.transform.rotation = playerRotation;
         }
 
-        xrRig.transform.position = playerObject.transform.position;
-        xrRig.transform.rotation = playerObject.transform.rotation;
+        xrRig.transform.position = currentCharacter.transform.position
+            + new Vector3(0f, currentCharacter.GetComponent<CharacterOffset>().rigOffset, 0f);
+        xrRig.transform.rotation = currentCharacter.transform.rotation;
     }
 }

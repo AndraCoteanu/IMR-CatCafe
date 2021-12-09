@@ -1,12 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CharacterSelection : MonoBehaviour
 {
-    private GameObject[] characterList;
+    public GameObject[] characterList;
     public int index;
-    // Start is called before the first frame update
+
     void Start()
     {
         index = PlayerPrefs.GetInt("CharacterSelected");
@@ -25,7 +23,7 @@ public class CharacterSelection : MonoBehaviour
             characterList[index].SetActive(true);
         }
     }
-    public void ToogleCharacter(bool isLeft)
+    public void SelectCharacter(bool isLeft)
     {
         characterList[index].SetActive(false);
         if (isLeft)

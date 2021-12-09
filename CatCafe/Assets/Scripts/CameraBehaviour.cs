@@ -11,12 +11,12 @@ public class CameraBehaviour : MonoBehaviour
     {
         if (neck == null)
         {
-            var playerObject = GameManager.instance.playerObject;
-            if (playerObject == null)
+            var character = GameManager.instance.currentCharacter;
+            if (character == null)
             {
                 return;
             }
-            neck = playerObject.transform.Find("Hips/Spine/Spine1/Spine2/Neck");
+            neck = character.transform.Find("Hips/Spine/Spine1/Spine2/Neck");
             head = neck.Find("Head");
         }
 

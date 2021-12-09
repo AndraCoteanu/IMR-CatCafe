@@ -10,13 +10,13 @@ public class ControllerBehaviour : MonoBehaviour
     {
         if (forearm == null || hand == null)
         {
-            var playerObject = GameManager.instance.playerObject;
-            if (playerObject == null)
+            var character = GameManager.instance.currentCharacter;
+            if (character == null)
             {
                 return;
             }
             var prefix = left ? "Left" : "Right";
-            forearm = playerObject.transform.Find("Hips/Spine/Spine1/Spine2/" + prefix + "Shoulder/" + prefix + "Arm/" + prefix + "ForeArm");
+            forearm = character.transform.Find("Hips/Spine/Spine1/Spine2/" + prefix + "Shoulder/" + prefix + "Arm/" + prefix + "ForeArm");
             hand = forearm.transform.Find(prefix + "Hand");
         }
 
