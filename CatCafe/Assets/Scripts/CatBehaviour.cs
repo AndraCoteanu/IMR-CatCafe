@@ -1,17 +1,28 @@
 using UnityEngine;
 using PathCreation;
 using Photon.Pun;
+using UnityEngine.XR.Interaction.Toolkit;
 
-public class PathFollower : MonoBehaviourPunCallbacks, IPunObservable
+[RequireComponent(typeof(ActionBasedController))]
+public class CatBehaviour : MonoBehaviourPunCallbacks, IPunObservable
 {
     public PathCreator pathCreator;
     public EndOfPathInstruction endOfPathInstruction;
     public float speed = 5;
     private float distanceTravelled;
     private bool synced = false;
+    private float patFinishTime = 0f;
+    private float patLength;
+    public Animator animator;
 
     void Start()
     {
+        animator = GetComponent<Animator>();
+        foreach (var clip in animator.runtimeAnimatorController.animationClips) {
+            if (clip.name == "rig|Play") {
+                patLength = clip.length;
+            }
+        }
         if (pathCreator != null)
         {
             // Subscribed to the pathUpdated event so that we're notified if the path changes during the game
@@ -31,9 +42,12 @@ public class PathFollower : MonoBehaviourPunCallbacks, IPunObservable
     {
         if (pathCreator != null && synced)
         {
-            distanceTravelled += speed * Time.deltaTime;
-            transform.position = pathCreator.path.GetPointAtDistance(distanceTravelled, endOfPathInstruction);
-            transform.rotation = pathCreator.path.GetRotationAtDistance(distanceTravelled, endOfPathInstruction);
+            if (patFinishTime <= Time.fixedTime)
+            {
+                distanceTravelled += speed * Time.deltaTime;
+                transform.position = pathCreator.path.GetPointAtDistance(distanceTravelled, endOfPathInstruction);
+                transform.rotation = pathCreator.path.GetRotationAtDistance(distanceTravelled, endOfPathInstruction);
+            }
         }
     }
 
@@ -60,6 +74,16 @@ public class PathFollower : MonoBehaviourPunCallbacks, IPunObservable
                 distanceTravelled = (float)stream.ReceiveNext();
                 synced = true;
             }
+        }
+    }
+
+    public void Pat(ActivateEventArgs args)
+    {
+        transform.LookAt(args.interactor.transform);
+        if (patFinishTime <= Time.fixedTime)
+        {
+            patFinishTime = Time.fixedTime + patLength;
+            animator.SetTrigger("Pat");
         }
     }
 }
