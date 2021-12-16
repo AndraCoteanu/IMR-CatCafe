@@ -9,17 +9,19 @@ public class CatBehaviour : MonoBehaviourPunCallbacks, IPunObservable
     public PathCreator pathCreator;
     public EndOfPathInstruction endOfPathInstruction;
     public float speed = 5;
-    private float distanceTravelled;
     private bool synced = false;
     private float patFinishTime = 0f;
     private float patLength;
     public Animator animator;
+    private float distanceTravelled;
 
     void Start()
     {
         animator = GetComponent<Animator>();
-        foreach (var clip in animator.runtimeAnimatorController.animationClips) {
-            if (clip.name == "rig|Play") {
+        foreach (var clip in animator.runtimeAnimatorController.animationClips)
+        {
+            if (clip.name == "rig|Play")
+            {
                 patLength = clip.length;
             }
         }
@@ -69,21 +71,24 @@ public class CatBehaviour : MonoBehaviourPunCallbacks, IPunObservable
         }
         else
         {
-            if (!synced)
-            {
-                distanceTravelled = (float)stream.ReceiveNext();
-                synced = true;
-            }
+            distanceTravelled = (float)stream.ReceiveNext();
+            synced = true;
         }
+    }
+
+    [PunRPC]
+    private void PlayPatAnimation(Vector3 whereTolookAt)
+    {
+        transform.LookAt(whereTolookAt);
+        patFinishTime = Time.fixedTime + patLength;
+        animator.SetTrigger("Pat");
     }
 
     public void Pat(ActivateEventArgs args)
     {
-        transform.LookAt(args.interactor.transform);
         if (patFinishTime <= Time.fixedTime)
         {
-            patFinishTime = Time.fixedTime + patLength;
-            animator.SetTrigger("Pat");
+            photonView.RPC("PlayPatAnimation", RpcTarget.All, args.interactor.transform.position);
         }
     }
 }
