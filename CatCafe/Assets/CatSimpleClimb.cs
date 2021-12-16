@@ -12,37 +12,27 @@ public class CatSimpleClimb : MonoBehaviour
     void Start()
     {
         animatorObject = GetComponent<Animator>();
-        stair1 = GameObject.Find("stair1");
+        stair1 = GameObject.Find("polysurface25");
     }
 
     // Update is called once per frame
-    void Update()
-    { 
+    void update()
+    {
         float distance = Vector3.Distance(stair1.transform.position, transform.position);
-        if (flag == false)
+        climbFirstStairs(distance);
+        float pozition= transform.position.y;
+        Debug.Log(pozition);
+        if (transform.position.y >= 10.00f)
         {
-            climbFirstStairs(distance);
-            flag = true;
+            float poz = 10.00f;
+            transform.Translate(0, poz, 0);
+            transform.position = new Vector3(-20.4f, 10.17f, -23.08f);
         }
-        else
-        {//try to walk to second stair
-            float positionx = transform.position.y;
-            if (positionx >= 4.60f && positionx <= 6.44f)
-            {
-
-                transform.Rotate(0, -187.633f, 0);
-                float translation = transform.position.z* speed;
-                translation *= Time.deltaTime;
-                transform.Translate(0, 0, translation);
-                animatorObject.SetBool("Walk", true);
-            }
-        }
-       
     }
 
     public void climbFirstStairs(float distance)
     {
-        if (distance > 0.2)
+        if (distance > 0.05)
         {
             animatorObject.Play("idle");
         }
@@ -51,15 +41,6 @@ public class CatSimpleClimb : MonoBehaviour
             animatorObject.Play("Upper");
 
         }
-        Debug.Log(distance);
+        //Debug.Log(distance);
     }
-    /*    public void walkToSecondStair(float positionx)
-    {
-        if (positionx >= -25.42815f && positionx <= -25.00f) { 
-
-            transform.Rotate(0, -187.633f, 0);
-            float translation = transform.position.x * speed;
-            translation *= Time.deltaTime;
-            transform.Translate(0, 0, translation); }
-    }*/
 }
