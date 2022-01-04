@@ -1,14 +1,38 @@
 fileFormatVersion: 2
-guid: 5681b1950ffc6384e93d43cc4ba6da87
+guid: d9ac017e6ab7a0e48b4c3bf26bc1e3e9
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable:
   - first:
+      74: 4874605699481857770
+    second: rig|Belly Up
+  - first:
+      74: 4042500482376264227
+    second: rig|Die
+  - first:
+      74: -512320013847864616
+    second: rig|Jump
+  - first:
+      74: -1165110950065857711
+    second: rig|Paw in Air
+  - first:
+      74: 7506493143321069512
+    second: rig|Paw Lick
+  - first:
       74: -1611564512743267473
     second: rig|Play
   - first:
+      74: -8582832921748046864
+    second: rig|Tail Wag
+  - first:
+      74: -3163482391615519523
+    second: rig|Tail Wag Sit
+  - first:
       74: 1023992570608409904
     second: rig|Walk
+  - first:
+      74: -2912753734065893457
+    second: rig|Walk Stander
   externalObjects: {}
   materials:
     materialImportMode: 2
