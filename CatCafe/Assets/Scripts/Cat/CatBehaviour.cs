@@ -10,21 +10,13 @@ public class CatBehaviour : MonoBehaviourPunCallbacks, IPunObservable
     public EndOfPathInstruction endOfPathInstruction;
     public float speed = 5;
     private bool synced = false;
-    private float patFinishTime = 0f;
-    private float patLength;
     public Animator animator;
     private float distanceTravelled;
+    private Vector3 whereToLookAt;
 
     void Start()
     {
         animator = GetComponent<Animator>();
-        foreach (var clip in animator.runtimeAnimatorController.animationClips)
-        {
-            if (clip.name == "rig|Play")
-            {
-                patLength = clip.length;
-            }
-        }
         if (pathCreator != null)
         {
             // Subscribed to the pathUpdated event so that we're notified if the path changes during the game
@@ -42,15 +34,27 @@ public class CatBehaviour : MonoBehaviourPunCallbacks, IPunObservable
 
     void Update()
     {
-        if (pathCreator != null && synced)
+        if (pathCreator != null)
         {
-            if (patFinishTime <= Time.fixedTime)
+            if (isWalking())
             {
-                distanceTravelled += speed * Time.deltaTime;
+                if (synced)
+                {
+                    distanceTravelled += speed * Time.deltaTime;
+                }
                 transform.position = pathCreator.path.GetPointAtDistance(distanceTravelled, endOfPathInstruction);
                 transform.rotation = pathCreator.path.GetRotationAtDistance(distanceTravelled, endOfPathInstruction);
             }
+            else
+            {
+                transform.LookAt(whereToLookAt);
+            }
         }
+    }
+
+    private bool isWalking()
+    {
+        return animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "rig|Walk";
     }
 
     // If the path changes during the game, update the distance travelled so that the follower's position on the new path
@@ -66,29 +70,34 @@ public class CatBehaviour : MonoBehaviourPunCallbacks, IPunObservable
         {
             if (synced)
             {
+                stream.SendNext(isWalking());
                 stream.SendNext(distanceTravelled);
             }
         }
         else
         {
+            var isWalking = (bool)stream.ReceiveNext();
             distanceTravelled = (float)stream.ReceiveNext();
-            synced = true;
+            if (isWalking)
+            {
+                synced = true;
+            }
         }
     }
 
     [PunRPC]
-    private void PlayPatAnimation(Vector3 whereTolookAt)
+    private void PlayPatAnimation(Vector3 whereToLookAt, int animation)
     {
-        transform.LookAt(whereTolookAt);
-        patFinishTime = Time.fixedTime + patLength;
-        animator.SetTrigger("Pat");
+        this.whereToLookAt = whereToLookAt;
+        animator.SetTrigger("pat" + animation);
     }
 
     public void Pat(ActivateEventArgs args)
     {
-        if (patFinishTime <= Time.fixedTime)
+        if (isWalking())
         {
-            photonView.RPC("PlayPatAnimation", RpcTarget.All, args.interactor.transform.position);
+            int animation = Random.Range(1, 7);
+            photonView.RPC("PlayPatAnimation", RpcTarget.All, args.interactor.transform.position, animation);
         }
     }
 }
