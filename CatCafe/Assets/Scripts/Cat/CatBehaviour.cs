@@ -52,6 +52,14 @@ public class CatBehaviour : MonoBehaviourPunCallbacks, IPunObservable
         }
     }
 
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.relativeVelocity != Vector3.zero)
+        {
+            animator.SetTrigger("die");
+        }
+    }
+
     private bool isWalking()
     {
         return animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "rig|Walk";
