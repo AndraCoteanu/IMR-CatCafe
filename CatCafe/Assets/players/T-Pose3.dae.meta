@@ -6,7 +6,27 @@ ModelImporter:
   - first:
       74: 1827226128182048838
     second: Take 001
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Boy01_Body_MAT
+    second: {fileID: 2100000, guid: a76e556a8b804e244903d5de5bb3c8cb, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Boy01_Brows_MAT1
+    second: {fileID: 2100000, guid: 205ec2d27fedf824b974096db1927d0a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Boy01_Eyes_MAT1
+    second: {fileID: 2100000, guid: a5abf7d93907d484980ea6419a721126, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Boy01_Mouth_MAT1
+    second: {fileID: 2100000, guid: 86b0fb38a7d01c242b0ed81cf7eacf19, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
