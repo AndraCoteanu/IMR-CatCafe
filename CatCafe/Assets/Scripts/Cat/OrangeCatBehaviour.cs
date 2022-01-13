@@ -4,7 +4,7 @@ using Photon.Pun;
 using UnityEngine.XR.Interaction.Toolkit;
 
 [RequireComponent(typeof(ActionBasedController))]
-public class CatBehaviour : MonoBehaviourPunCallbacks, IPunObservable
+public class OrangeCatBehaviour : MonoBehaviourPunCallbacks, IPunObservable
 {
     public PathCreator pathCreator;
     public EndOfPathInstruction endOfPathInstruction;
